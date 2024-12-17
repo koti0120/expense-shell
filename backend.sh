@@ -8,6 +8,8 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+echo "please enter db password:"
+read -s mysql_root_password
 
 VALIDATE(){
     if [ $1 -ne 0 ]
@@ -51,9 +53,30 @@ VALIDATE $? "creating app directory"
 curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>$LOG_FILE
 VALIDATE $? "download the zip file"
 
-cd /app
-unzip /tmp/backend.zip
+cd /app &>>$LOG_FILE
+unzip /tmp/backend.zip &>>$LOG_FILE
 VALIDATE $? "extracting zip file"
 
-npm install
+npm install &>>$LOG_FILE
 VALIDATE $? "installing node js depencies"
+
+cp /home/ec2-user/expense-shell/backend.service /etc/systemd/system/backend.service &>>$LOG_FILE
+VALIDATE $? "copied backend service"
+
+systemctl daemon-reload &>>$LOG_FILE
+VALIDATE $? "daemon reload"
+
+systemctl start backend &>>$LOG_FILE
+VALIDATE $? "start backend"
+
+systemctl enable backend &>>$LOG_FILE
+VALIDATE $? "enable backend"
+
+dnf install mysql -y &>>$LOG_FILE
+VALIDATE $? "installing mysql"
+
+mysql -h db.kanakm.top -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOG_FILE
+VALIDATE $? "loading schema"
+
+systemctl restart backend &>>$LOG_FILE
+VALIDATE $? "restart backend"
