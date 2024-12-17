@@ -29,9 +29,17 @@ fi
 
 dnf module disable nodejs -y &>>$LOG_FILE
 VALIDATE $? "disable default node js"
+
 dnf module enable nodejs:20 -y &>>$LOG_FILE
 VALIDATE $? "enable latest node js"
+
 dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "install node js"
-useradd expense &>>$LOG_FILE
-VALIDATE $? "creating expense user"
+
+id expense
+if [ $? -ne 0 ]
+then
+   useradd expense &>>$LOG_FILE
+   VALIDATE $? "creating expense user"
+else
+   echo -e "user already created $Y SKIPPING $N"
