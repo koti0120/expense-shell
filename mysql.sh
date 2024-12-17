@@ -8,6 +8,8 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+echo "please enter db password:"
+read -s mysql_root_password
 
 VALIDATE(){
     if [ $1 -ne 0 ]
@@ -40,10 +42,10 @@ VALIDATE $? "start mysql"
 # VALIDATE $? "setting up root password"
 
 #Below code is useful for idempotency nature
-mysql -h db.kanakm.top -uroot -pExpenseApp@1 'show databases;' &>>$LOG_FILE
+mysql -h db.kanakm.top -uroot -p${mysql_root_password} 'show databases;' &>>$LOG_FILE
 if [ $? -ne 0 ]
 then
-   mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
+   mysql_secure_installation --set-root-pass ${mysql_root_password} &>>$LOG_FILE
    VALIDATE $? "setting up root password"
 else 
    echo -e "my sql root password already setup..$Y SKIPPING $N"
