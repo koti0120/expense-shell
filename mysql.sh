@@ -36,5 +36,15 @@ VALIDATE $? "enable mysqld"
 systemctl start mysqld &>>$LOG_FILE
 VALIDATE $? "start mysql" 
 
-mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
-VALIDATE $? "setting up root password"
+# mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
+# VALIDATE $? "setting up root password"
+
+#Below code is useful for idempotency nature
+mysql -h db.kanakm.top -uroot -pExpenseApp@1 'show databases;' &>>$LOG_FILE
+if [ $? -ne 0 ]
+then
+   mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
+   VALIDATE $? "setting up root password"
+else 
+   echo -e "my sql root password already setup..$Y SKIPPING $N"
+fi
