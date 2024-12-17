@@ -76,7 +76,7 @@ VALIDATE $? "enable backend"
 dnf install mysql -y &>>$LOG_FILE
 VALIDATE $? "installing mysql"
 
-mysql -h db.kanakm.top -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOG_FILE
+mysql -h db.kanakam.top -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOG_FILE
 VALIDATE $? "loading schema"
 
 systemctl restart backend &>>$LOG_FILE
